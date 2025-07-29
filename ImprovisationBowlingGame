@@ -1,0 +1,76 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+int calculateScore(const vector<int>& frames) {
+    int score = 0;
+    int i = 0;
+
+    for (int frame = 0; frame < 9; ++frame)
+    {
+        if(frames[i] == 10){ // Strike
+            score += 10 + frames[i+1] + frames[i+2];
+            i += 1;
+        }
+        else if(frames[i] + frames[i+1] == 10){ // Spare
+            score += 10 + frames[i+2];
+            i += 2;
+        }
+        else { // Open frame
+            score += frames[i] + frames[i+1];
+            i += 2;
+        }
+    }
+
+    // Frame 10 (special case)
+    if(frames[i] == 10){
+        score += 10 + frames[i+1] + frames[i+2];
+    }
+    else if(frames[i] + frames[i+1] == 10){
+        score += 10 + frames[i+2];
+    }
+    else {
+        score += frames[i] + frames[i+1];
+    }
+    return score;
+}
+
+void InputRollsToFrame(vector<int>& frames) {
+    for (int frame = 0; frame < 10; ++frame) {
+        bool flag = false;
+        int roll1, roll2;
+
+        while (!flag) {
+            cout << "Frame " << frame + 1 << ":\n";
+
+            cout << "Give 1st roll output: ";
+            cin >> roll1;
+
+            cout << "Give 2nd roll output: ";
+            cin >> roll2;
+
+            if (roll1 < 0 || roll2 < 0 || roll1 + roll2 > 10) {
+                cout << "Invalid rolls thrown\n";
+                continue;
+            } else {
+                cout << "Valid rolls thrown\n";
+                frames.push_back(roll1);
+                frames.push_back(roll2);
+                flag = true;
+            }
+        }
+    }
+}
+
+int main() {
+    vector<int> frames(10); //size = 10
+    
+    InputRollsToFrame(frames);
+
+    int totalScore = calculateScore(frames);
+    cout << "Total Bowling Score: " << totalScore << endl;
+
+    return 0;
+}
