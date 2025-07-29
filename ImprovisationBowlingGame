@@ -38,37 +38,93 @@ int calculateScore(const vector<int>& frames) {
 }
 
 void InputRollsToFrame(vector<int>& frames) {
-    for (int frame = 0; frame < 10; ++frame) {
-        bool flag = false;
-        int roll1, roll2;
+    int roll1 = 0, roll2 = 0, roll3 = 0;
 
-        while (!flag) {
-            cout << "Frame " << frame + 1 << ":\n";
+    // Frames 1 to 9
+    for (int frame = 0; frame < 9; ++frame) {
+        bool valid = false;
+        while (!valid) {
+            cout << "\nFrame " << frame + 1 << ":\n";
 
-            cout << "Give 1st roll output: ";
+            cout << "Give 1st roll: ";
             cin >> roll1;
 
-            cout << "Give 2nd roll output: ";
-            cin >> roll2;
+            if (roll1 == 10) {
+                // Strike
+                cout << "Strike!\n";
+                frames.push_back(10);
+                valid = true;
+            } else if (roll1 >= 0 && roll1 < 10) { // spare or open
+                cout << "Give 2nd roll: ";
+                cin >> roll2;
 
-            if (roll1 < 0 || roll2 < 0 || roll1 + roll2 > 10) {
-                cout << "Invalid rolls thrown\n";
-                continue;
+                if (roll2 >= 0 && (roll1 + roll2) <= 10) {
+                    frames.push_back(roll1);
+                    frames.push_back(roll2);
+                    cout << ((roll1 + roll2 == 10) ? "Spare!\n" : "Open frame.\n");
+                    valid = true;
+                } else {
+                    cout << "Invalid second roll. Try again.\n";
+                }
             } else {
-                cout << "Valid rolls thrown\n";
-                frames.push_back(roll1);
-                frames.push_back(roll2);
-                flag = true;
+                cout << "Invalid first roll. Try again.\n";
             }
         }
     }
+
+    // Frame 10
+    while (true) {
+        cout << "\nFinal Frame (10):\n";
+        cout << "\nGive 1st roll: ";
+        cin >> roll1;
+
+        if (roll1 < 0 || roll1 > 10) {
+            cout << "Invalid first roll. Try again.\n";
+            continue;
+        }
+
+        cout << "Give 2nd roll: ";
+        cin >> roll2;
+
+        if (roll2 < 0 || ((roll1 != 10) && (roll1 + roll2 > 10))) {
+            cout << "Invalid second roll. Try again.\n";
+            continue;
+        }
+
+        frames.push_back(roll1);
+        frames.push_back(roll2);
+
+        if (roll1 == 10 || roll1 + roll2 == 10) {
+            // Strike or spare → allow 3rd roll
+            cout << "Bonus! Give 3rd roll: ";
+            cin >> roll3;
+            while (roll3 < 0 || roll3 > 10) {
+                cout << "Invalid bonus roll. Try again: ";
+                cin >> roll3;
+            }
+            frames.push_back(roll3);
+        }
+        break;
+    }
 }
 
-int main() {
-    vector<int> frames(10); //size = 10
-    
-    InputRollsToFrame(frames);
 
+int main() {
+    vector<int> frames; //size = 10
+    // vector<int> rolls = {
+    // 1, 4,   // Frame 1 = 5
+    // 4, 5,   // Frame 2 = 9
+    // 6, 4,   // Frame 3 = 10 + 5 = 15
+    // 5, 5,   // Frame 4 = 10 + 10 = 20
+    // 10,     // Frame 5 = 10 + 0 + 1 = 11
+    // 0, 1,   // Frame 6 = 1
+    // 7, 3,   // Frame 7 = 10 + 6 = 16
+    // 6, 4,   // Frame 8 = 10 + 10 = 20
+    // 10,     // Frame 9 = 10 + 2 + 8 = 20
+    // 2, 8, 6 // Frame 10 = 10 + 6 = 16
+    // };
+    InputRollsToFrame(frames);
+    
     int totalScore = calculateScore(frames);
     cout << "Total Bowling Score: " << totalScore << endl;
 
